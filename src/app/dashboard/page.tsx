@@ -1,5 +1,6 @@
 "use client"
 import { useAuth } from "@/core/context/authContext";
+import withAuth from "@/core/middleware/withAuth";
 import PrivateRoute from "@/core/routes/privateRoute";
 import { useRouter } from "next/navigation"; // Use next/navigation instead of next/router
 
@@ -25,4 +26,4 @@ const DashboardPage = () => {
     );
 };
 
-export default DashboardPage;
+export default withAuth(DashboardPage);
