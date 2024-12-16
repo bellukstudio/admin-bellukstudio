@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/core/context/authContext";
-import Loader from "@/components/common/Loader";
+import Loader from "@/components-theme/common/Loader";
 import axios from "axios";
 import { useRouter } from "next/navigation"; // Use next/navigation instead of next/router
 

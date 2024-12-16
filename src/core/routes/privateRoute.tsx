@@ -1,6 +1,6 @@
 "use client";
 
-import Loader from "@/components/common/Loader";
+import Loader from "@/components-theme/common/Loader";
 import { useAuth } from "@/core/context/authContext";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect } from "react";
