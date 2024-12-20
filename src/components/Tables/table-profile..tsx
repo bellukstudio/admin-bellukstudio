@@ -1,19 +1,42 @@
+import apiService from "@/core/response/apiResponse";
 import { Profile } from "@/types/profile";
-import { useState } from "react";
-
-const packageData: Profile[] = [
-    { fullName: "John Doe", email: "john@example.com", contact: "123456789", photo: "-", background: "-", overview: '' },
-    { fullName: "Jane Smith", email: "jane@example.com", contact: "987654321", photo: "-", background: "-", overview: '' },
-    { fullName: "Alice Johnson", email: "alice@example.com", contact: "543216789", photo: "-", background: "-", overview: '' },
-];
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const TableProfile = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const [profiles, setProfiles] = useState<Profile[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const router = useRouter();
+    const [loading, setLoading] = useState<boolean>(true);
+
     const itemsPerPage = 5;
 
-    const filteredData = packageData.filter((item) =>
-        item.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const fetchProfiles = async () => {
+        try {
+            const response = await apiService.get<{ profile: Profile[] }>('/myprofile');
+            if (Array.isArray(response.data.profile)) {
+
+                setProfiles(response.data.profile);
+            } else {
+                console.error('Data is not an array:', response.data);
+                setProfiles([]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch profiles:', error);
+        }
+    };
+
+
+    useEffect(() => {
+        setTimeout(() => setLoading(false), 1000);
+        fetchProfiles();
+
+    }, [loading]);
+
+    const filteredData = profiles.filter((item) =>
+        item.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -23,9 +46,39 @@ const TableProfile = () => {
         currentPage * itemsPerPage
     );
 
+
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+
+    const handleEdit = (id: string) => {
+        router.push(`/profile/${id}`);
+    };
+
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this profile?")) {
+            setLoading(true);
+            try {
+                const response = await apiService.remove<{ message: string }>(`/myprofile/${id}/delete`);
+
+                if (response.meta.code === 200) {
+                    alert(response.data.message);
+                    // Filter out the deleted profile from the state to update the UI without needing to re-fetch
+                    setProfiles(profiles.filter((profile) => profile.id !== id));
+                    location.reload();
+                } else {
+                    alert("Failed to delete the profile.");
+                }
+            } catch (error) {
+                console.error("Error during profile delete:", error);
+                alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
 
     return (
         <div className="overflow-auto rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -69,13 +122,33 @@ const TableProfile = () => {
                     <tbody>
                         {paginatedData.map((item, index) => (
                             <tr key={index}>
-                                <td className="px-4 py-4">{item.fullName}</td>
+                                <td className="px-4 py-4">{item.fullname}</td>
                                 <td className="px-4 py-4">{item.email}</td>
                                 <td className="px-4 py-4">{item.contact}</td>
-                                <td className="px-4 py-4">{item.photo}</td>
-                                <td className="px-4 py-4">{item.background}</td>
-                                <td className="px-4 py-4">Edit | Delete</td>
+                                <td className="px-4 py-4">
+                                    <Image width={100} height={100} src={item.photo} alt="photo" />
+                                </td>
+                                <td className="px-4 py-4">
+                                    <Image width={100} height={100} src={item.background} alt="background" />
+                                </td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => handleEdit(item.id)}
+                                            className="rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
+
                         ))}
                         {paginatedData.length === 0 && (
                             <tr>

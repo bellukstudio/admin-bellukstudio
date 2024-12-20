@@ -3,11 +3,12 @@
 import {
     createContext,
     useContext,
+    useState,
+    useEffect,
     ReactNode,
     useMemo,
 } from "react";
 import { useRouter } from "next/navigation";
-import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface AuthContextType {
     token: string | null;
@@ -22,21 +23,35 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    // Gantikan useState dengan useLocalStorage
-    const [token, setToken] = useLocalStorage<string | null>("jwtToken", null);
+    const [token, setToken] = useState<string | null>(null);
+    const [isClient, setIsClient] = useState(false); // Ensure consistent hydration
     const router = useRouter();
 
+    useEffect(() => {
+        setIsClient(true); // Set to true once the client mounts
+        const storedToken = localStorage.getItem("jwtToken");
+        if (storedToken) {
+            setToken(storedToken); // Use the token directly as a string
+        }
+    }, []);
+
     const login = (jwtToken: string) => {
-        setToken(jwtToken); // Update token di localStorage
+        setToken(jwtToken);
+        localStorage.setItem("jwtToken", jwtToken);
         router.push("/dashboard");
     };
 
     const logout = () => {
-        setToken(null); // Hapus token dari localStorage
+        setToken(null);
+        localStorage.removeItem("jwtToken");
         router.push("/");
     };
 
     const value = useMemo(() => ({ token, login, logout }), [token]);
+
+    if (!isClient) {
+        return null; // Avoid rendering until the client has mounted
+    }
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -1,9 +1,47 @@
 "use client";
+import Loader from "@/components-theme/common/Loader";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import TableProfile from "@/components/Tables/table-profile.";
+import apiService from "@/core/response/apiResponse";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Profile } from "@/types/profile";
 
-const Profile = () => {
+const ProfilePage = () => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [hiddenButton, setHiddenButton] = useState<boolean>(false);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await apiService.get<{ profile: Profile[] }>('/myprofile');
+        const fetchedProfiles = response.data.profile;
+
+        if (Array.isArray(fetchedProfiles)) {
+          setHiddenButton(fetchedProfiles.length > 0);
+          setProfiles(fetchedProfiles);
+        } else {
+          console.error('Data is not an array:', fetchedProfiles);
+          setProfiles([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch profiles:', error);
+        setProfiles([]);
+      } finally {
+        setLoading(false); 
+      }
+    };
+
+    fetchData();
+  }, [loading]); 
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <DefaultLayout>
       {/* Root container with min-h-screen to ensure full screen */}
@@ -11,12 +49,12 @@ const Profile = () => {
         {/* Container content */}
         <div className="mx-auto max-w-7xl py-10 px-4 sm:px-6 lg:px-8">
           {/* Link */}
-          <Link
-            href="#"
+          {hiddenButton ? null : (<Link
+            href="/profile/create"
             className="inline-flex items-center justify-center rounded-full bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
           >
             Create Profile
-          </Link>
+          </Link>)}
 
           {/* Table Section */}
           <div className="flex flex-col gap-10 mt-10">
@@ -28,4 +66,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfilePage;
