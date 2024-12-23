@@ -16,11 +16,10 @@ const TableProfile = () => {
     const fetchProfiles = async () => {
         try {
             const response = await apiService.get<{ profile: Profile[] }>('/myprofile');
-            if (Array.isArray(response.data.profile)) {
-
-                setProfiles(response.data.profile);
+            const fetchedProfiles = response.data.profile;
+            if (fetchProfiles.length > 0) {
+                setProfiles(fetchedProfiles);
             } else {
-                console.error('Data is not an array:', response.data);
                 setProfiles([]);
             }
         } catch (error) {

@@ -19,24 +19,24 @@ const ProfilePage = () => {
       try {
         const response = await apiService.get<{ profile: Profile[] }>('/myprofile');
         const fetchedProfiles = response.data.profile;
-
-        if (Array.isArray(fetchedProfiles)) {
-          setHiddenButton(fetchedProfiles.length > 0);
+        if (fetchedProfiles.length > 0) {
           setProfiles(fetchedProfiles);
+          setHiddenButton(true);
         } else {
-          console.error('Data is not an array:', fetchedProfiles);
           setProfiles([]);
+          setHiddenButton(false)
         }
+        // }
       } catch (error) {
         console.error('Failed to fetch profiles:', error);
         setProfiles([]);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, [loading]); 
+  }, [loading]);
 
   if (loading) {
     return <Loader />;

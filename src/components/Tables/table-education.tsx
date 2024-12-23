@@ -1,17 +1,30 @@
+import apiService from "@/core/response/apiResponse";
 import { Education } from "@/types/education";
-import { useState } from "react";
-
-const packageData: Education[] = [
-    { educationLevel: "-", fieldOfStudy: "-", finishMonth: "-", institution: "-", startMonth: "-" },
-    { educationLevel: "-", fieldOfStudy: "-", finishMonth: "-", institution: "-", startMonth: "-" },
-];
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const TableEducation = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
+    const [education, setEducation] = useState<Education[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const router = useRouter();
 
-    const filteredData = packageData.filter((item) =>
+    const fetchEducation = async () => {
+        try {
+            const response = await apiService.get<{ education: Education[] }>('/education');
+            const fetchEducation = response.data.education;
+            if (fetchEducation.length > 0) {
+                setEducation(fetchEducation);
+            } else {
+                setEducation([]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch education:', error);
+        }
+    }
+    const filteredData = education.filter((item) =>
         item.educationLevel.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.institution.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -24,6 +37,40 @@ const TableEducation = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+
+    useEffect(() => {
+        setTimeout(() => setLoading(false), 1000);
+        fetchEducation();
+
+    }, [loading]);
+
+    const handleEdit = (id: string) => {
+        router.push(`/education/${id}`);
+    }
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this education?")) {
+            setLoading(true);
+            try {
+                const response = await apiService.remove<{ message: string }>(`/education/${id}/delete`);
+
+                if (response.meta.code === 200) {
+                    alert(response.data.message);
+                    // Filter out the deleted profile from the state to update the UI without needing to re-fetch
+                    setEducation(education.filter((education) => education.id !== id));
+                    // location.reload();
+                } else {
+                    alert("Failed to delete the profile.");
+                }
+            } catch (error) {
+                console.error("Error during profile delete:", error);
+                alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        }
+    }
+
+
     return (
         <div className="overflow-auto rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             {/* Search Input */}
@@ -71,7 +118,22 @@ const TableEducation = () => {
                                 <td className="px-4 py-4">{item.fieldOfStudy}</td>
                                 <td className="px-4 py-4">{item.startMonth}</td>
                                 <td className="px-4 py-4">{item.finishMonth}</td>
-                                <td className="px-4 py-4">Edit | Delete</td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => handleEdit(item.id)}
+                                            className="rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (
