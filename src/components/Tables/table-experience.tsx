@@ -1,20 +1,17 @@
+import apiService from "@/core/response/apiResponse";
 import { Experience } from "@/types/experience";
-import { useState } from "react";
-
-const packageData: Experience[] = [
-    { jobTitle: "-", companyName: "-", finishMonth: "-", overview: "-", startMonth: "-" },
-    { jobTitle: "-", companyName: "-", finishMonth: "-", overview: "-", startMonth: "-" },
-];
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const TableExperience = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
-
-
-    const filteredData = packageData.filter((item) =>
+    const [experience, setExperience] = useState<Experience[]>([]);
+    const router = useRouter();
+    const filteredData = experience.filter((item) =>
         item.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.companyName.toLowerCase().includes(searchTerm.toLowerCase())
+        item.company.toLowerCase().includes(searchTerm.toLowerCase())
     );
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const paginatedData = filteredData.slice(
@@ -22,6 +19,40 @@ const TableExperience = () => {
         currentPage * itemsPerPage
     );
 
+    useEffect(() => {
+        fetchData();
+    }, [experience]);
+
+    const fetchData = async () => {
+        try {
+            const response = await apiService.get<{ experience: Experience[] }>("/experiences");
+            const fetchExperience = response.data.experience;
+            if (fetchExperience.length > 0) {
+                setExperience(fetchExperience);
+            } else {
+                setExperience([]);
+            }
+        } catch (error) {
+            console.error("Error fetching experience data:", error);
+        }
+    }
+
+    const handleEdit = (id: string) => {
+        router.push(`/experience/${id}`);
+    }
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this experience?")) {
+            try {
+                const response = await apiService.remove<{ message: string }>(`/experiences/${id}/delete`);
+                if (response.meta.code === 200) {
+                    alert(response.data.message);
+                    setExperience(experience.filter((experience) => experience.id !== id));
+                }
+            } catch (error) {
+                console.error("Error deleting experience:", error);
+            }
+        }
+    }
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -57,9 +88,7 @@ const TableExperience = () => {
                             <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
                                 Finish Month
                             </th>
-                            <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
-                                Overview
-                            </th>
+                    
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
                                 Actions
                             </th>
@@ -69,11 +98,25 @@ const TableExperience = () => {
                         {paginatedData.map((item, index) => (
                             <tr key={index}>
                                 <td className="px-4 py-4">{item.jobTitle}</td>
-                                <td className="px-4 py-4">{item.companyName}</td>
+                                <td className="px-4 py-4">{item.company}</td>
                                 <td className="px-4 py-4">{item.startMonth}</td>
                                 <td className="px-4 py-4">{item.finishMonth}</td>
-                                <td className="px-4 py-4">{item.overview}</td>
-                                <td className="px-4 py-4">Edit | Delete</td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => handleEdit(item.id)}
+                                            className="rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (
