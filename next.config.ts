@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: 'storage.googleapis.com',
         pathname: '/**', // Match all paths under this hostname
       },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co', // Corrected: Removed protocol
+        pathname: '/**', // Match all paths under this hostname
+      },
     ],
   },
 };

@@ -90,9 +90,6 @@ const TablePortfolio = () => {
                             <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
                                 Title
                             </th>
-                            <th className="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                                Description
-                            </th>
                             <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
                                 Url Portfolio
                             </th>
@@ -109,10 +106,16 @@ const TablePortfolio = () => {
                         {paginatedData.map((item, index) => (
                             <tr key={index}>
                                 <td className="px-4 py-4">{item.title}</td>
-                                <td className="px-4 py-4">{item.description}</td>
                                 <td className="px-4 py-4">{item.urlPortfolio}</td>
                                 <td className="px-4 py-4">
-                                    <Image width={100} height={100} src={item.thumbnail} alt="thumbnail" /></td>
+                                    <Image
+                                        width={100}
+                                        height={100}
+                                        src={item.thumbnail ? item.thumbnail : "https://placehold.co/600x400"}
+                                        alt="thumbnail"
+                                    />
+                                </td>
+
                                 <td className="px-4 py-4">
                                     <div className="flex items-center space-x-4">
                                         <button

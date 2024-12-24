@@ -1,17 +1,17 @@
+import apiService from "@/core/response/apiResponse";
 import { Skill } from "@/types/sklill";
-import { useState } from "react";
-
-const packageData: Skill[] = [
-    { skillName: "-", level: "-" },
-    { skillName: "-", level: "-" },
-];
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const TableSkill = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
+    const [skill, setSkill] = useState<Skill[]>([]);
+    const router = useRouter();
 
-    const filteredData = packageData.filter((item) =>
+
+    const filteredData = skill.filter((item) =>
         item.skillName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.level.toLowerCase().includes(searchTerm.toLocaleLowerCase())
     );
@@ -21,10 +21,47 @@ const TableSkill = () => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    
+
+    const fetchSkill = async () => {
+        try {
+            const response = await apiService.get<{ skill: Skill[] }>("/skill");
+            const fetchSkill = response.data.skill;
+            if (fetchSkill.length > 0) {
+                setSkill(fetchSkill);
+            } else {
+                setSkill([]);
+            }
+        } catch (error) {
+            console.error("Failed to fetch skill:", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchSkill();
+    }, [skill]);
+
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+
+    const handleEdit = (id: string) => {
+        router.push(`/skill/${id}`);
+    }
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this skill?")) {
+            try {
+                const response = await apiService.remove<{ message: string }>(`/skill/${id}/delete`);
+                if (response.meta.code === 200) {
+                    alert(response.data.message);
+                    setSkill(skill.filter((skill) => skill.id !== id));
+                }
+            } catch (error) {
+                console.error("Error during skill deletion:", error);
+                alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
+            }
+        }
+    }
     return (
         <div className="overflow-auto rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             {/* Search Input */}
@@ -60,7 +97,22 @@ const TableSkill = () => {
                             <tr key={index}>
                                 <td className="px-4 py-4">{item.skillName}</td>
                                 <td className="px-4 py-4">{item.level}</td>
-                                <td className="px-4 py-4">Edit | Delete</td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => handleEdit(item.id)}
+                                            className="rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (

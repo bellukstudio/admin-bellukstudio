@@ -39,6 +39,8 @@ const OverviewPage = () => {
         } catch (error) {
             console.error("Error during overview creation:", error);
             alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
+        }finally {
+            setLoading(false);  
         }
     };
     return (

@@ -40,8 +40,8 @@ const CreatExperience = () => {
                 'overview': overview,
             });
 
-            if(response.meta.code !== 201){
-                if(response.meta.message  === "Unauthorized"){
+            if (response.meta.code !== 201) {
+                if (response.meta.message === "Unauthorized") {
                     logout();
                     router.push("/");
                 }
@@ -53,6 +53,8 @@ const CreatExperience = () => {
         } catch (error) {
             console.error("Error during experience creation:", error);
             alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
+        } finally {
+            setLoading(false);
         }
     }
 

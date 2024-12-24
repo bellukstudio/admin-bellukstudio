@@ -137,7 +137,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                                         onChange={handleChange}
                                         cols={10}
                                         required
-                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg"></textarea>
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg dark:text-white"></textarea>
 
                                 </div>
                             </div>
