@@ -1,17 +1,18 @@
+import apiService from "@/core/response/apiResponse";
 import { Portfolio } from "@/types/portfolio";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
-const packageData: Portfolio[] = [
-    { title: "-", description: "-", thumbnail: "-", url: "-" },
-    { title: "-", description: "-", thumbnail: "-", url: "-" }
-];
 
 const TablePortfolio = () => {
-    const [searchTerm, setSearchTerm] = useState<string>(""); 
-    const [currentPage, setCurrentPage] = useState<number>(1); 
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
-
-    const filteredData = packageData.filter((item) =>
+    const [portfolio, setPortfolio] = useState<Portfolio[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const router = useRouter();
+    const filteredData = portfolio.filter((item) =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -21,9 +22,52 @@ const TablePortfolio = () => {
         currentPage * itemsPerPage
     );
 
+    const fetchPortfolio = async () => {
+        try {
+            const response = await apiService.get<{ portfolio: Portfolio[] }>("/portfolio");
+            const portfolioData = response.data.portfolio;
+
+            if (portfolioData.length > 0) {
+                setPortfolio(portfolioData);
+            } else {
+                setPortfolio([]);
+            }
+        } catch (error) {
+            console.error("Error fetching portfolio:", error);
+            alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
+        }
+    }
+
+    useEffect(() => {
+        fetchPortfolio();
+        setTimeout(() => setLoading(false), 1000);
+    }, [loading]);
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+
+    const handleEdit = (id: string) => {
+        router.push(`/portfolio/${id}`);
+    }
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this portfolio?")) {
+            setLoading(true);
+            try {
+                const response = await apiService.remove<{ message: string }>(`/portfolio/${id}/delete`);
+                if (response.meta.code === 200) {
+                    alert(response.data.message);
+                    setPortfolio(portfolio.filter((portfolio) => portfolio.id !== id));
+                } else {
+                    alert("Failed to delete the portfolio.");
+                }
+            } catch (error) {
+                console.error("Error during portfolio delete:", error);
+                alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
+            }
+        }
+    }
+
     return (
         <div className="overflow-auto rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             {/* Search Input */}
@@ -66,9 +110,25 @@ const TablePortfolio = () => {
                             <tr key={index}>
                                 <td className="px-4 py-4">{item.title}</td>
                                 <td className="px-4 py-4">{item.description}</td>
-                                <td className="px-4 py-4">{item.url}</td>
-                                <td className="px-4 py-4">{item.thumbnail}</td>
-                                <td className="px-4 py-4">Edit | Delete</td>
+                                <td className="px-4 py-4">{item.urlPortfolio}</td>
+                                <td className="px-4 py-4">
+                                    <Image width={100} height={100} src={item.thumbnail} alt="thumbnail" /></td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => handleEdit(item.id)}
+                                            className="rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (

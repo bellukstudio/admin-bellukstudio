@@ -17,7 +17,7 @@ const TableProfile = () => {
         try {
             const response = await apiService.get<{ profile: Profile[] }>('/myprofile');
             const fetchedProfiles = response.data.profile;
-            if (fetchProfiles.length > 0) {
+            if (fetchedProfiles.length > 0) {
                 setProfiles(fetchedProfiles);
             } else {
                 setProfiles([]);

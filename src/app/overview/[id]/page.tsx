@@ -29,7 +29,9 @@ const EditOverview = ({ params }: { params: { id: string } }) => {
     }
 
     useEffect(() => {
-        fetchOverview();
+        if (params?.id) {
+            fetchOverview();
+        }
         setTimeout(() => setLoading(false), 1000);
     }, [loading]);
 
@@ -86,7 +88,7 @@ const EditOverview = ({ params }: { params: { id: string } }) => {
                                     rows={10}
                                     name="overview"
                                     required
-                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    className=" dark:text-white w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 ></textarea>
                             </div>
 

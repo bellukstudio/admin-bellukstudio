@@ -13,7 +13,7 @@ const Portfolio = () => {
                 <div className="mx-auto max-w-7xl py-10 px-4 sm:px-6 lg:px-8">
                     {/* Link */}
                     <Link
-                        href="#"
+                        href="/portfolio/create"
                         className="inline-flex items-center justify-center rounded-full bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
                     >
                         Add Portfolio

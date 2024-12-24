@@ -2,6 +2,6 @@ export type Portfolio = {
     id:string,
     title: string,
     description: string,
-    url: string,
+    urlPortfolio: string,
     thumbnail: string
 }
