@@ -57,7 +57,6 @@ const TableEducation = () => {
                     alert(response.data.message);
                     // Filter out the deleted profile from the state to update the UI without needing to re-fetch
                     setEducation(education.filter((education) => education.id !== id));
-                    // location.reload();
                 } else {
                     alert("Failed to delete the profile.");
                 }

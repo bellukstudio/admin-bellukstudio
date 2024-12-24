@@ -1,21 +1,41 @@
+import apiService from "@/core/response/apiResponse";
 import { Overview } from "@/types/overview";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const packageData: Overview[] = [
-    { overview: '-' },
-    { overview: '-' },
-];
 
 const TableOverview = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
+    const [overview, setOverview] = useState<Overview[]>([]);
+    const router = useRouter();
 
 
-    const filteredData = packageData.filter((item) =>
+    const filteredData = overview.filter((item) =>
         item.overview.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    useEffect(() => {
+        fetchOverview();
+    }, [overview]);
+
+    const fetchOverview = async () => {
+        try {
+            const response = await apiService.get<{ overview: Overview[] }>('/overview');
+            const overview = response.data.overview;
+
+            if (overview.length > 0) {
+                setOverview(overview);
+            } else {
+                setOverview([]);
+            }
+
+        } catch (error) {
+            console.error("Error fetching overview:", error);
+
+        }
+    };
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const paginatedData = filteredData.slice(
@@ -25,6 +45,26 @@ const TableOverview = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+    const handleEdit = (id: string) => {
+        router.push(`/overview/${id}`);
+    }
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm("Are you sure you want to delete this overview?")) {
+            try {
+                const response = await apiService.remove<{ message: string }>(`/overview/${id}/delete`);
+                if (response.meta.code === 200) {
+                    alert(response.data.message);
+                    setOverview(overview.filter((overview) => overview.id !== id));
+                    location.reload();
+                } else {
+                    alert(response.meta.message);
+                }
+            } catch (error) {
+                console.error("Error deleting overview:", error);
+            }
+        }
+    }
     return (
         <div className="overflow-auto rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             {/* Search Input */}
@@ -56,7 +96,22 @@ const TableOverview = () => {
                         {paginatedData.map((item, index) => (
                             <tr key={index}>
                                 <td className="px-4 py-4">{item.overview}</td>
-                                <td className="px-4 py-4">Edit | Delete</td>
+                                <td className="px-4 py-4">
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => handleEdit(item.id)}
+                                            className="rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (

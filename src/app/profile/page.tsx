@@ -10,7 +10,6 @@ import { Profile } from "@/types/profile";
 const ProfilePage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [hiddenButton, setHiddenButton] = useState<boolean>(false);
-  const [profiles, setProfiles] = useState<Profile[]>([]);
 
 
   useEffect(() => {
@@ -20,16 +19,13 @@ const ProfilePage = () => {
         const response = await apiService.get<{ profile: Profile[] }>('/myprofile');
         const fetchedProfiles = response.data.profile;
         if (fetchedProfiles.length > 0) {
-          setProfiles(fetchedProfiles);
           setHiddenButton(true);
         } else {
-          setProfiles([]);
           setHiddenButton(false)
         }
         // }
       } catch (error) {
         console.error('Failed to fetch profiles:', error);
-        setProfiles([]);
       } finally {
         setLoading(false);
       }
