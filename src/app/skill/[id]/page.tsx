@@ -1,9 +1,12 @@
 "use client"
 
 import Loader from "@/components-theme/common/Loader";
+import ErrorMessage from "@/components/Errors/error-message";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useAuth } from "@/core/context/authContext";
 import apiService from "@/core/response/apiResponse";
+import { skillValidationSchema } from "@/core/validation/schemaValidation";
+import { validateForm } from "@/core/validation/utility/validationForm";
 import { Skill } from "@/types/sklill";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +20,7 @@ const EditSkill = ({ params }: { params: { id: string } }) => {
         skillName: "",
         level: "",
     });
+    const [errorForm, setErrorForm] = useState<any[]>([]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -49,6 +53,18 @@ const EditSkill = ({ params }: { params: { id: string } }) => {
         e.preventDefault();
         setLoading(true);
         try {
+            const validationResponse = validateForm(skillValidationSchema, {
+                skillName: formData.skillName,
+                level: formData.level,
+            });
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                setLoading(false);
+                throw new Error("Validation error");
+            }
+
+
             const response = await apiService.update<{ skill: Skill }>(`/skill/${params.id}/update`, {
                 'skillName': formData.skillName,
                 'level': formData.level,
@@ -99,6 +115,7 @@ const EditSkill = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="skillName" />
                                 </div>
                             </div>
                             <div className="mb-4.5">
@@ -115,6 +132,7 @@ const EditSkill = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="level" />
                                 </div>
                             </div>
 

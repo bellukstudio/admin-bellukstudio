@@ -49,5 +49,5 @@ export const portfolioValidationSchema = z.object({
 
 export const skillValidationSchema = z.object({
     skillName: z.string().nonempty(),
-    skillLevel: z.string().nonempty(),
+    level: z.string().nonempty(),
 });
