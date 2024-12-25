@@ -1,8 +1,11 @@
 "use client"
 import Loader from "@/components-theme/common/Loader";
+import ErrorMessage from "@/components/Errors/error-message";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useAuth } from "@/core/context/authContext";
 import apiService from "@/core/response/apiResponse";
+import { educationValidationSchema } from "@/core/validation/schemaValidation";
+import { validateForm } from "@/core/validation/utility/validationForm";
 import { Education } from "@/types/education";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,6 +16,8 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
     const { logout } = useAuth();
+    const [errorForm, setErrorForm] = useState<any[]>([]);
+
     const [formData, setFormData] = useState({
         educationLevel: "",
         institution: "",
@@ -61,6 +66,21 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
         setLoading(true);
 
         try {
+            const validationResponse = validateForm(educationValidationSchema, {
+                educationLevel: formData.educationLevel,
+                institution: formData.institution,
+                fieldOfStudy: formData.fieldOfStudy,
+                startMonth: formData.startMonth,
+                finishMonth: formData.finishMonth
+            });
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                setLoading(false);
+                throw new Error("Validation failed");
+            }
+
+            setErrorForm([]);
 
             const response = await apiService.update<{ education: Education }>(`/education/${params?.id}/update`, {
                 'educationLevel': formData.educationLevel,
@@ -114,6 +134,7 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field={'educationLevel'} />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -129,6 +150,7 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field={'institution'} />
                                 </div>
                             </div>
                             <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -145,6 +167,7 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field={'fieldOfStudy'} />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -160,6 +183,7 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field={'startMonth'} />
                                 </div>
                             </div>
                             <div className="mb-4.5">
@@ -175,6 +199,7 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
                                     required
                                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 />
+                                <ErrorMessage errors={errorForm} field={'finishMonth'} />
                             </div>
 
                             <div className='mb-5 flex flex-col gap-6 xl:flex-row'>

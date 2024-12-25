@@ -5,12 +5,17 @@ import { useAuth } from "@/core/context/authContext";
 import Loader from "@/components-theme/common/Loader";
 import { useRouter } from "next/navigation"; // Use next/navigation instead of next/router
 import apiService from "@/core/response/apiResponse";
+import { z } from "zod";
+import { loginValidationSchema } from "@/core/validation/schemaValidation";
+import { validateForm } from "@/core/validation/utility/validationForm";
+import ErrorMessage from "@/components/Errors/error-message";
 
 const SignIn: React.FC = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [errorForm, setErrorForm] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { login, token } = useAuth();
   const router = useRouter();
@@ -36,11 +41,22 @@ const SignIn: React.FC = () => {
     setError(null);
 
     try {
+
+      const validationResponse = validateForm(loginValidationSchema, { email, password });
+
+
+      if (!validationResponse.success) {
+        setErrorForm(validationResponse.errors);
+        setLoading(false);
+        throw new Error("Validation failed");
+      }
+
+      setErrorForm([]);
+
       const response = await apiService.post<{ token: string }>('/auth/login', {
         email,
         password,
       });
-
       if (response.meta.code === 201 && response.data?.token) {
         login(response.data.token);
       } else {
@@ -59,7 +75,7 @@ const SignIn: React.FC = () => {
   return (
     <div>
       {loading ? (
-        <Loader/>
+        <Loader />
       ) : (
         <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
           <div className="rounded-sm border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark">
@@ -78,6 +94,7 @@ const SignIn: React.FC = () => {
                       type="email"
                       placeholder="Enter your email"
                       value={email}
+                      name="email"
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
@@ -100,6 +117,7 @@ const SignIn: React.FC = () => {
                       </svg>
                     </span>
                   </div>
+                  <ErrorMessage errors={errorForm} field="email" />
                 </div>
 
                 <div className="mb-6">
@@ -110,6 +128,7 @@ const SignIn: React.FC = () => {
                     <input
                       type="password"
                       value={password}
+                      name="password"
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="6+ Characters, 1 Capital letter"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -137,6 +156,7 @@ const SignIn: React.FC = () => {
                       </svg>
                     </span>
                   </div>
+                  <ErrorMessage errors={errorForm} field="password" />
                 </div>
 
                 <div className="mb-5">

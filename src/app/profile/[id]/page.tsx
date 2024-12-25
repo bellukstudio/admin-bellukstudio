@@ -1,9 +1,12 @@
 "use client"
 
 import Loader from '@/components-theme/common/Loader';
+import ErrorMessage from '@/components/Errors/error-message';
 import DefaultLayout from '@/components/Layouts/DefaultLayout';
 import { useAuth } from '@/core/context/authContext';
 import apiService from '@/core/response/apiResponse';
+import { editProfileValidationSchema } from '@/core/validation/schemaValidation';
+import { validateForm } from '@/core/validation/utility/validationForm';
 import { Profile } from '@/types/profile';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -15,6 +18,8 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
     const { logout } = useAuth();
+    const [errorForm, setErrorForm] = useState<any[]>([]);
+
     const [formData, setFormData] = useState({
         firstName: "",
         email: "",
@@ -27,7 +32,7 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
             fetchProfile(params.id);
         }
         setTimeout(() => setLoading(false), 1000);
-    }, [params,loading]);
+    }, [params, loading]);
 
     const fetchProfile = async (id: string) => {
         try {
@@ -59,7 +64,21 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
         setLoading(true);
 
         try {
+            const validationResponse = validateForm(editProfileValidationSchema, {
+                firstname: formData.firstName,
+                email: formData.email,
+                contact: formData.contact,
+                overview: formData.overview,
 
+            });
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                throw new Error("Validation failed");
+            }
+
+
+            setErrorForm([]);
             const postProfile = await apiService.update<{ profile: Profile }>(`/myprofile/${params?.id}/update`, {
                 'fullname': formData.firstName,
                 'email': formData.email,
@@ -117,13 +136,14 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                                 </label>
                                 <input
                                     type="text"
-                                    name="firstName"
+                                    name="firstname"
                                     value={formData.firstName}
                                     onChange={handleChange}
                                     placeholder="Enter your first name"
                                     required
                                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 />
+                                <ErrorMessage errors={errorForm} field="firstname" />
                             </div>
 
                             <div className="mb-4.5">
@@ -139,6 +159,7 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                                     required
                                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 />
+                                <ErrorMessage errors={errorForm} field="email" />
                             </div>
 
                             <div className="mb-4.5">
@@ -154,6 +175,7 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                                     required
                                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 />
+                                <ErrorMessage errors={errorForm} field="contact" />
                             </div>
 
                             <div className='mb-4.5 flex flex-col gap-6 xl:flex-row'>
@@ -195,6 +217,7 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                                     required
                                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 ></textarea>
+                                <ErrorMessage errors={errorForm} field="overview" />
                             </div>
 
                             <div className='mb-5 flex flex-col gap-6 xl:flex-row'>

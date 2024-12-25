@@ -1,9 +1,12 @@
 "use client"
 
 import Loader from "@/components-theme/common/Loader";
+import ErrorMessage from "@/components/Errors/error-message";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useAuth } from "@/core/context/authContext";
 import apiService from "@/core/response/apiResponse";
+import { skillValidationSchema } from "@/core/validation/schemaValidation";
+import { validateForm } from "@/core/validation/utility/validationForm";
 import { Skill } from "@/types/sklill";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,12 +18,23 @@ const CreateSkill = () => {
     const [skillName, setSkillName] = useState("");
     const [level, setLevel] = useState("");
     const { logout } = useAuth();
+    const [errorForm, setErrorForm] = useState<any[]>([]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
+            const validationResponse = validateForm(skillValidationSchema, {
+                skillName: skillName,
+                level: level,
+            })
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                setLoading(false);
+                throw new Error("Validation error");
+            }
             const response = await apiService.post<{ skill: Skill }>("/skill/store", {
                 'skillName': skillName,
                 'level': level,
@@ -38,7 +52,7 @@ const CreateSkill = () => {
             router.push("/skill");
         } catch (error) {
             alert(error instanceof Error ? error.message : "An error occurred. Please try again.");
-        }finally{
+        } finally {
             setLoading(false);
         }
     }
@@ -71,6 +85,7 @@ const CreateSkill = () => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="skillName" />
                                 </div>
                             </div>
                             <div className="mb-4.5">
@@ -87,6 +102,7 @@ const CreateSkill = () => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="level" />
                                 </div>
                             </div>
 

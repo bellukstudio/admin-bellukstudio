@@ -1,9 +1,12 @@
 "use client"
 
 import Loader from "@/components-theme/common/Loader";
+import ErrorMessage from "@/components/Errors/error-message";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useAuth } from "@/core/context/authContext";
 import apiService from "@/core/response/apiResponse";
+import { portfolioValidationSchema } from "@/core/validation/schemaValidation";
+import { validateForm } from "@/core/validation/utility/validationForm";
 import { Portfolio } from "@/types/portfolio";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,7 +21,7 @@ const CreatePortfolio: React.FC = () => {
     const [urlPortofolio, setUrlPortofolio] = useState("");
     const { logout } = useAuth();
     const [thumbnail, setThumbnail] = useState<File | null>(null);
-
+    const [errorForm, setErrorForm] = useState<any[]>([]);
 
     useEffect(() => {
         setTimeout(() => setLoading(false), 1000);
@@ -29,6 +32,18 @@ const CreatePortfolio: React.FC = () => {
         setLoading(true);
 
         try {
+
+            const validationResponse = validateForm(portfolioValidationSchema, {
+                title: title,
+                description: description,
+                urlPortfolio: urlPortofolio,
+            });
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                setLoading(false);
+                throw new Error("Please fill in the required fields.");
+            }
             const response = await apiService.post<{ portfolio: Portfolio }>("/portfolio/store", {
                 'title': title,
                 'description': description,
@@ -85,8 +100,10 @@ const CreatePortfolio: React.FC = () => {
                                         onChange={(e) => setTitle(e.target.value)}
                                         value={title}
                                         required
+                                        name="title"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="title" />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -99,8 +116,10 @@ const CreatePortfolio: React.FC = () => {
                                         onChange={(e) => setUrlPortofolio(e.target.value)}
                                         value={urlPortofolio}
                                         required
+                                        name="urlPortfolio"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="urlPortfolio" />
                                 </div>
                             </div>
 
@@ -116,8 +135,9 @@ const CreatePortfolio: React.FC = () => {
                                         cols={10}
                                         value={description}
                                         required
+                                        name="description"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg dark:text-white"></textarea>
-
+                                    <ErrorMessage errors={errorForm} field="description" />
                                 </div>
                             </div>
                             <div className="mb-45">
@@ -127,6 +147,7 @@ const CreatePortfolio: React.FC = () => {
                                     </label>
                                     <input
                                         type="file"
+                                        name="photo"
                                         onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
                                         className="w-full cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:px-5 file:py-3 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
                                     />

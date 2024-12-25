@@ -7,6 +7,9 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useRouter } from "next/navigation";
 import apiService from "@/core/response/apiResponse";
 import { Experience } from "@/types/experience";
+import { validateForm } from "@/core/validation/utility/validationForm";
+import { experienceValidationSchema } from "@/core/validation/schemaValidation";
+import ErrorMessage from "@/components/Errors/error-message";
 
 
 const CreatExperience = () => {
@@ -20,6 +23,7 @@ const CreatExperience = () => {
     const [startMonth, setStartMonth] = useState("");
     const [endMonth, setEndMonth] = useState("");
     const [overview, setOverview] = useState("");
+    const [errorForm, setErrorForm] = useState<any[]>([]);
 
 
     useEffect(() => {
@@ -29,9 +33,24 @@ const CreatExperience = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
-            setLoading(true);
 
+            const validationResponse = validateForm(experienceValidationSchema, {
+                jobtitle: jobTitle,
+                company: companyTitle,
+                startMonth: startMonth,
+                finishMonth: endMonth,
+                overview: overview
+            })
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                setLoading(false);
+                throw new Error("Invalid form data. Please check the form for errors.");
+            }
+
+            setErrorForm([]);
             const response = await apiService.post<{ experience: Experience }>("/experiences/store", {
                 'jobtitle': jobTitle,
                 'company': companyTitle,
@@ -83,8 +102,10 @@ const CreatExperience = () => {
                                         onChange={(e) => setJobTitle(e.target.value)}
                                         value={jobTitle}
                                         required
+                                        name="jobtitle"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="jobtitle" />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -97,8 +118,10 @@ const CreatExperience = () => {
                                         onChange={(e) => setCompanyTitle(e.target.value)}
                                         value={companyTitle}
                                         required
+                                        name="company"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="company" />
                                 </div>
                             </div>
                             <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -112,8 +135,11 @@ const CreatExperience = () => {
                                         onChange={(e) => setStartMonth(e.target.value)}
                                         value={startMonth}
                                         required
+                                        name="startMonth"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+
+                                    <ErrorMessage errors={errorForm} field="startMonth" />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -126,8 +152,10 @@ const CreatExperience = () => {
                                         onChange={(e) => setEndMonth(e.target.value)}
                                         value={endMonth}
                                         required
+                                        name="finishMonth"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="finishMonth" />
                                 </div>
                             </div>
                             <div className="mb-4.5">
@@ -140,9 +168,11 @@ const CreatExperience = () => {
                                     value={overview}
                                     cols={30}
                                     rows={10}
+                                    name="overview"
                                     required
                                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 ></textarea>
+                                <ErrorMessage errors={errorForm} field="overview" />
                             </div>
 
                             <div className='mb-5 flex flex-col gap-6 xl:flex-row'>

@@ -1,9 +1,12 @@
 "use client"
 
 import Loader from "@/components-theme/common/Loader";
+import ErrorMessage from "@/components/Errors/error-message";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useAuth } from "@/core/context/authContext";
 import apiService from "@/core/response/apiResponse";
+import { portfolioValidationSchema } from "@/core/validation/schemaValidation";
+import { validateForm } from "@/core/validation/utility/validationForm";
 import { Portfolio } from "@/types/portfolio";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,7 +19,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
     const [loading, setLoading] = useState(false);
     const { logout } = useAuth();
     const [thumbnail, setThumbnail] = useState<File | null>(null);
-
+    const [errorForm, setErrorForm] = useState<any[]>([]);
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -48,6 +51,17 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
         setLoading(true);
 
         try {
+            const validationResponse = validateForm(portfolioValidationSchema, {
+                title: formData.title,
+                description: formData.description,
+                urlPortfolio: formData.urlPortfolio,
+            });
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                setLoading(false);
+                throw new Error("Please fill in the required fields.");
+            }
             const response = await apiService.update<{ portfolio: Portfolio }>(`/portfolio/${params.id}/update`, {
                 'title': formData.title,
                 'description': formData.description,
@@ -106,6 +120,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="title" />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -121,6 +136,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="urlPortfolio" />
                                 </div>
                             </div>
 
@@ -138,7 +154,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                                         cols={10}
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg dark:text-white"></textarea>
-
+                                    <ErrorMessage errors={errorForm} field="description" />
                                 </div>
                             </div>
                             <div className="mb-45">

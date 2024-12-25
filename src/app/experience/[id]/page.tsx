@@ -1,8 +1,11 @@
 "use client"
 import Loader from "@/components-theme/common/Loader";
+import ErrorMessage from "@/components/Errors/error-message";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useAuth } from "@/core/context/authContext";
 import apiService from "@/core/response/apiResponse";
+import { experienceValidationSchema } from "@/core/validation/schemaValidation";
+import { validateForm } from "@/core/validation/utility/validationForm";
 import { Experience } from "@/types/experience";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,6 +24,8 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
         finishMonth: "",
         overview: ""
     });
+    const [errorForm, setErrorForm] = useState<any[]>([]);
+
 
 
     useEffect(() => {
@@ -50,7 +55,22 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await apiService.update<{ experience: Experience }>(`/experiences/${params.id}/update`,{
+            const validationResponse = validateForm(experienceValidationSchema, {
+                jobtitle: formData.jobTitle,
+                company: formData.company,
+                startMonth: formData.startMonth,
+                finishMonth: formData.finishMonth,
+                overview: formData.overview
+            })
+
+            if (!validationResponse.success) {
+                setErrorForm(validationResponse.errors);
+                setLoading(false);
+                throw new Error("Validation failed");
+            }
+
+            setErrorForm([]);
+            const response = await apiService.update<{ experience: Experience }>(`/experiences/${params.id}/update`, {
                 'jobTitle': formData.jobTitle,
                 'company': formData.company,
                 'startMonth': formData.startMonth,
@@ -58,8 +78,8 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
                 'overview': formData.overview,
             });
 
-            if(response.meta.code !== 200){
-                if(response.meta.message  === "Unauthorized"){
+            if (response.meta.code !== 200) {
+                if (response.meta.message === "Unauthorized") {
                     logout();
                     router.push("/");
                 }
@@ -97,6 +117,7 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="jobtitle" />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -112,6 +133,7 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="company" />
                                 </div>
                             </div>
                             <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -128,6 +150,8 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+
+                                    <ErrorMessage errors={errorForm} field="startMonth" />
                                 </div>
 
                                 <div className="w-full xl:w-1/2">
@@ -143,6 +167,7 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
                                         required
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     />
+                                    <ErrorMessage errors={errorForm} field="finishMonth" />
                                 </div>
                             </div>
                             <div className="mb-4.5">
@@ -159,6 +184,7 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
                                     required
                                     className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                 ></textarea>
+                                <ErrorMessage errors={errorForm} field="overview" />
                             </div>
 
                             <div className='mb-5 flex flex-col gap-6 xl:flex-row'>
