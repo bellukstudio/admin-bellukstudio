@@ -3,5 +3,6 @@ export type Portfolio = {
     title: string,
     description: string,
     urlPortfolio: string,
+    urlGithub: string,
     thumbnail: string
 }

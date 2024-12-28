@@ -24,6 +24,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
         title: "",
         description: "",
         urlPortfolio: "",
+        urlGithub: "",
     });
 
     const fetchPortfolio = async () => {
@@ -55,6 +56,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                 title: formData.title,
                 description: formData.description,
                 urlPortfolio: formData.urlPortfolio,
+                urlGithub: formData.urlGithub
             });
 
             if (!validationResponse.success) {
@@ -139,8 +141,24 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                                     <ErrorMessage errors={errorForm} field="urlPortfolio" />
                                 </div>
                             </div>
-
-                            <div className="mb-45">
+                            <div className="mb-4.5">
+                                <div className="w-full">
+                                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                        Url Github
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter your url github"
+                                        onChange={handleChange}
+                                        value={formData.urlGithub}
+                                        required
+                                        name="urlGithub"
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    />
+                                    <ErrorMessage errors={errorForm} field="urlGithub" />
+                                </div>
+                            </div>
+                            <div className="mb-4.5">
                                 <div className="w-full">
                                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                                         Description
@@ -157,7 +175,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                                     <ErrorMessage errors={errorForm} field="description" />
                                 </div>
                             </div>
-                            <div className="mb-45">
+                            <div className="mb-4.5">
                                 <div className='w-full'>
                                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                                         Attach file Photo

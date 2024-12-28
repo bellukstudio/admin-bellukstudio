@@ -24,7 +24,11 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
         firstName: "",
         email: "",
         contact: "",
-        overview: "",
+        overview: "",  
+        livein: "",
+        available: "",
+        degree: "",
+        birthday: "",
     });
 
     useEffect(() => {
@@ -44,6 +48,10 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                     email: data.email || "",
                     contact: data.contact || "",
                     overview: data.overview || "",
+                    livein: data.liveIn || "",
+                    available: data.available || "",
+                    degree: data.degree || "",
+                    birthday: data.birthOfDay || "",
                 });
             }
         } catch (error) {
@@ -69,6 +77,10 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                 email: formData.email,
                 contact: formData.contact,
                 overview: formData.overview,
+                livein: formData.livein,
+                available: formData.available,
+                degree: formData.degree,
+                birthday: formData.birthday,
 
             });
 
@@ -84,6 +96,10 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                 'email': formData.email,
                 'contact': formData.contact,
                 'overview': formData.overview,
+                'liveIn': formData.livein,
+                'available': formData.available,
+                'degree': formData.degree,
+                'birthOfDay': formData.birthday,
             });
 
             if (postProfile.meta.code != 200) {
@@ -145,6 +161,39 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                                 />
                                 <ErrorMessage errors={errorForm} field="firstname" />
                             </div>
+                            <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                <div className="w-full xl:w-1/2">
+                                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                        Live In
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.livein}
+                                        onChange={handleChange}
+                                        placeholder="Enter your live in"
+                                        required
+                                        name='livein'
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    />
+                                    <ErrorMessage errors={errorForm} field='livein' />
+                                </div>
+
+                                <div className="w-full xl:w-1/2">
+                                    <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                        Available
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.available}
+                                        onChange={handleChange}
+                                        placeholder="Enter your availabe"
+                                        required
+                                        name='available'
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    />
+                                    <ErrorMessage errors={errorForm} field='available' />
+                                </div>
+                            </div>
 
                             <div className="mb-4.5">
                                 <label className="mb-3 block text-sm font-medium text-black dark:text-white">
@@ -161,7 +210,36 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
                                 />
                                 <ErrorMessage errors={errorForm} field="email" />
                             </div>
-
+                            <div className="mb-4.5">
+                                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                    Degree
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.degree}
+                                    onChange={handleChange}
+                                    placeholder="Degree"
+                                    required
+                                    name='degree'
+                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                />
+                                <ErrorMessage errors={errorForm} field='degree' />
+                            </div>
+                            <div className="mb-4.5">
+                                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                    BirthDay
+                                </label>
+                                <input
+                                    type="date"
+                                    value={formData.birthday}
+                                    onChange={handleChange}
+                                    placeholder="Birth Day"
+                                    required
+                                    name='birthday'
+                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                />
+                                <ErrorMessage errors={errorForm} field='birthday' />
+                            </div>
                             <div className="mb-4.5">
                                 <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                                     Contact

@@ -18,6 +18,7 @@ const CreatePortfolio: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [urlGithub, setUrlGithub] = useState("");
     const [urlPortofolio, setUrlPortofolio] = useState("");
     const { logout } = useAuth();
     const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -37,6 +38,7 @@ const CreatePortfolio: React.FC = () => {
                 title: title,
                 description: description,
                 urlPortfolio: urlPortofolio,
+                urlGithub: urlGithub
             });
 
             if (!validationResponse.success) {
@@ -48,6 +50,7 @@ const CreatePortfolio: React.FC = () => {
                 'title': title,
                 'description': description,
                 'urlPortfolio': urlPortofolio,
+                'urlGithub': urlGithub,
             });
 
             if (response.meta.code !== 201) {
@@ -123,24 +126,39 @@ const CreatePortfolio: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="mb-45">
+                            <div className="mb-4.5">
                                 <div className="w-full">
                                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                                        Description
+                                        Url Github
                                     </label>
-                                    <textarea
-                                        placeholder="Enter your description"
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        rows={10}
-                                        cols={10}
-                                        value={description}
+                                    <input
+                                        type="text"
+                                        placeholder="Enter your url github"
+                                        onChange={(e) => setUrlGithub(e.target.value)}
+                                        value={urlGithub}
                                         required
-                                        name="description"
-                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg dark:text-white"></textarea>
-                                    <ErrorMessage errors={errorForm} field="description" />
+                                        name="urlGithub"
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    />
+                                    <ErrorMessage errors={errorForm} field="urlGithub" />
                                 </div>
                             </div>
-                            <div className="mb-45">
+                            <div className="mb-6">
+                                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                                    Description
+                                </label>
+                                <textarea
+                                    rows={6}
+                                    value={description}
+                                    name='description'
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="Type your description"
+                                    required
+                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                ></textarea>
+                                <ErrorMessage errors={errorForm} field='description' />
+                            </div>
+                            <div className="mb-4.5">
                                 <div className='w-full'>
                                     <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                                         Attach file Photo

@@ -11,6 +11,10 @@ export const profileValidationSchema = z.object({
     email: z.string().email(),
     contact: z.string().nonempty(),
     overview: z.string().nonempty(),
+    livein: z.string().nonempty(),
+    available: z.string().nonempty(),
+    degree: z.string().nonempty(),
+    birthday: z.string().nonempty(),
 });
 
 export const editProfileValidationSchema = z.object({
@@ -38,6 +42,10 @@ export const experienceValidationSchema = z.object({
 
 export const overviewValidationSchema = z.object({
     overview: z.string().nonempty(),
+    urlGithub: z.string().nonempty(),
+    urlLinkedin: z.string().nonempty(),
+    githubName: z.string().nonempty(),
+    linkedinName: z.string().nonempty(),
 });
 
 
@@ -45,6 +53,7 @@ export const portfolioValidationSchema = z.object({
     title: z.string().nonempty(),
     description: z.string().nonempty(),
     urlPortfolio: z.string().nonempty(),
+    urlGithub: z.string().nonempty(),
 });
 
 export const skillValidationSchema = z.object({

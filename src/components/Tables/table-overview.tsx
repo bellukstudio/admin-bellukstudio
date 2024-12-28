@@ -2,6 +2,7 @@ import apiService from "@/core/response/apiResponse";
 import { Overview } from "@/types/overview";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 
 const TableOverview = () => {
@@ -85,6 +86,21 @@ const TableOverview = () => {
                     <thead>
                         <tr className="bg-gray-2 text-left dark:bg-meta-4">
                             <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                Url Github
+                            </th>
+                            <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                Url Linked In
+                            </th>
+                            <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                Github Name
+                            </th>
+                            <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                Linked In Name
+                            </th>
+                            <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                Photo
+                            </th>
+                            <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
                                 Overview
                             </th>
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
@@ -95,6 +111,11 @@ const TableOverview = () => {
                     <tbody>
                         {paginatedData.map((item, index) => (
                             <tr key={index}>
+                                <td className="px-4 py-4">{item.urlGithub}</td>
+                                <td className="px-4 py-4">{item.urlLinkedIn}</td>
+                                <td className="px-4 py-4">{item.githubName}</td>
+                                <td className="px-4 py-4">{item.linkedInName}</td>
+                                <td className="px-4 py-4"> <Image width={100} height={100} src={item.photo} alt="photo" /></td>
                                 <td className="px-4 py-4">{item.overview}</td>
                                 <td className="px-4 py-4">
                                     <div className="flex items-center space-x-4">

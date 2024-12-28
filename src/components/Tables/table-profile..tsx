@@ -110,6 +110,18 @@ const TableProfile = () => {
                                 Contact
                             </th>
                             <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
+                                Degree
+                            </th>
+                            <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
+                                Live In
+                            </th>
+                            <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
+                                Available
+                            </th>
+                            <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
+                                Birthday
+                            </th>
+                            <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
                                 Photo
                             </th>
                             <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
@@ -124,6 +136,16 @@ const TableProfile = () => {
                                 <td className="px-4 py-4">{item.fullname}</td>
                                 <td className="px-4 py-4">{item.email}</td>
                                 <td className="px-4 py-4">{item.contact}</td>
+                                <td className="px-4 py-4">{item.degree}</td>
+                                <td className="px-4 py-4">{item.liveIn}</td>
+                                <td className="px-4 py-4">{item.available}</td>
+                                <td className="px-4 py-4">
+                                    {new Date(item.birthOfDay).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </td>
                                 <td className="px-4 py-4">
                                     <Image width={100} height={100} src={item.photo} alt="photo" />
                                 </td>

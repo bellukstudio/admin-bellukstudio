@@ -94,6 +94,9 @@ const TablePortfolio = () => {
                                 Url Portfolio
                             </th>
                             <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
+                                Url Github
+                            </th>
+                            <th className="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
                                 Thumbnail
                             </th>
 
@@ -107,6 +110,7 @@ const TablePortfolio = () => {
                             <tr key={index}>
                                 <td className="px-4 py-4">{item.title}</td>
                                 <td className="px-4 py-4">{item.urlPortfolio}</td>
+                                <td className="px-4 py-4">{item.urlGithub}</td>
                                 <td className="px-4 py-4">
                                     <Image
                                         width={100}

@@ -6,4 +6,8 @@ export type Profile = {
     overview: string,
     photo: string,
     background: string
+    liveIn: string,
+    available: string,
+    degree: string,
+    birthOfDay: string
 }
