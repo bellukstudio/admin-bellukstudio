@@ -9,15 +9,16 @@ import { editProfileValidationSchema } from '@/core/validation/schemaValidation'
 import { validateForm } from '@/core/validation/utility/validationForm';
 import { Profile } from '@/types/profile';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-const EditProfile = ({ params }: { params: { id: string } }) => {
+const EditProfile = () => {
     const [photo, setPhoto] = useState<File | null>(null);
     const [background, setBackground] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
     const { logout } = useAuth();
+    const { id } = useParams();
     const [errorForm, setErrorForm] = useState<any[]>([]);
 
     const [formData, setFormData] = useState({
@@ -32,11 +33,11 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
     });
 
     useEffect(() => {
-        if (params?.id) {
-            fetchProfile(params.id);
+        if (typeof id === "string") {
+            fetchProfile(id); // id is explicitly a string here
         }
         setTimeout(() => setLoading(false), 1000);
-    }, [params, loading]);
+    }, []);
 
     const fetchProfile = async (id: string) => {
         try {
@@ -91,7 +92,7 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
 
 
             setErrorForm([]);
-            const postProfile = await apiService.update<{ profile: Profile }>(`/myprofile/${params?.id}/update`, {
+            const postProfile = await apiService.update<{ profile: Profile }>(`/myprofile/${id}/update`, {
                 'fullname': formData.firstName,
                 'email': formData.email,
                 'contact': formData.contact,
@@ -112,14 +113,14 @@ const EditProfile = ({ params }: { params: { id: string } }) => {
             }
 
             if (photo) {
-                const responsePhoto = await apiService.uploadFile(`/myprofile/upload/${params?.id}`, photo);
+                const responsePhoto = await apiService.uploadFile(`/myprofile/upload/${id}`, photo);
                 if (![200, 201].includes(responsePhoto.meta.code)) {
                     throw new Error("Failed to upload photo.");
                 }
             }
 
             if (background) {
-                const responseBackground = await apiService.uploadFile(`/myprofile/uploadBackground/${params?.id}`, background);
+                const responseBackground = await apiService.uploadFile(`/myprofile/uploadBackground/${id}`, background);
                 if (![200, 201].includes(responseBackground.meta.code)) {
                     throw new Error("Failed to upload background.");
                 }

@@ -32,7 +32,7 @@ const TableProfile = () => {
         setTimeout(() => setLoading(false), 1000);
         fetchProfiles();
 
-    }, [loading]);
+    }, []);
 
     const filteredData = profiles.filter((item) =>
         item.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -19,7 +19,7 @@ const TableOverview = () => {
 
     useEffect(() => {
         fetchOverview();
-    }, [overview]);
+    }, []);
 
     const fetchOverview = async () => {
         try {

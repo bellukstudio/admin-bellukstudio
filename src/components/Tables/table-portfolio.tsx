@@ -41,7 +41,7 @@ const TablePortfolio = () => {
     useEffect(() => {
         fetchPortfolio();
         setTimeout(() => setLoading(false), 1000);
-    }, [loading]);
+    }, []);
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };

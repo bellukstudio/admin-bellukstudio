@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import Loader from "@/components-theme/common/Loader";
 import ErrorMessage from "@/components/Errors/error-message";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
@@ -8,13 +9,13 @@ import { educationValidationSchema } from "@/core/validation/schemaValidation";
 import { validateForm } from "@/core/validation/utility/validationForm";
 import { Education } from "@/types/education";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-
-const EditEducation = ({ params }: { params: { id: string } }) => {
+const EditEducation = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
+    const { id } = useParams(); // Updated to use `useParams` for route parameters
     const { logout } = useAuth();
     const [errorForm, setErrorForm] = useState<any[]>([]);
 
@@ -27,12 +28,11 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
     });
 
     useEffect(() => {
-        if (params?.id) {
-            fetchEducation(params.id);
+        if (typeof id === "string") {
+            fetchEducation(id); // id is explicitly a string here
         }
         setTimeout(() => setLoading(false), 1000);
-    }, [params, loading]);
-
+    }, []);
 
     const fetchEducation = async (id: string) => {
         try {
@@ -82,7 +82,7 @@ const EditEducation = ({ params }: { params: { id: string } }) => {
 
             setErrorForm([]);
 
-            const response = await apiService.update<{ education: Education }>(`/education/${params?.id}/update`, {
+            const response = await apiService.update<{ education: Education }>(`/education/${id}/update`, {
                 'educationLevel': formData.educationLevel,
                 'institution': formData.institution,
                 'fieldOfStudy': formData.fieldOfStudy,

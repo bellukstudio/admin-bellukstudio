@@ -42,7 +42,7 @@ const TableEducation = () => {
         setTimeout(() => setLoading(false), 1000);
         fetchEducation();
 
-    }, [loading, education]);
+    }, [ ]);
 
     const handleEdit = (id: string) => {
         router.push(`/education/${id}`);

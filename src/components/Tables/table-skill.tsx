@@ -38,7 +38,7 @@ const TableSkill = () => {
 
     useEffect(() => {
         fetchSkill();
-    }, [skill]);
+    }, []);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);

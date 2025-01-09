@@ -32,7 +32,7 @@ const ProfilePage = () => {
     };
 
     fetchData();
-  }, [loading]);
+  }, []);
 
   if (loading) {
     return <Loader />;

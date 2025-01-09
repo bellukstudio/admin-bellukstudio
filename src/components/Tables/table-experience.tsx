@@ -21,7 +21,7 @@ const TableExperience = () => {
 
     useEffect(() => {
         fetchData();
-    }, [experience]);
+    }, []);
 
     const fetchData = async () => {
         try {

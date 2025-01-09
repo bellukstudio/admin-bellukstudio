@@ -9,11 +9,11 @@ import { portfolioValidationSchema } from "@/core/validation/schemaValidation";
 import { validateForm } from "@/core/validation/utility/validationForm";
 import { Portfolio } from "@/types/portfolio";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
-const EditPortfolio = ({ params }: { params: { id: string } }) => {
+const EditPortfolio = () => {
 
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -26,10 +26,11 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
         urlPortfolio: "",
         urlGithub: "",
     });
+    const { id } = useParams();
 
-    const fetchPortfolio = async () => {
+    const fetchPortfolio = async (id: string) => {
         try {
-            const response = await apiService.get<{ portfolio: Portfolio }>(`/portfolio/${params.id}`);
+            const response = await apiService.get<{ portfolio: Portfolio }>(`/portfolio/${id}`);
             const fetchPortfolio = response.data.portfolio;
             if (response.meta.code === 200) {
                 setFormData(fetchPortfolio);
@@ -41,11 +42,11 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
     }
 
     useEffect(() => {
-        if (params?.id) {
-            fetchPortfolio();
+        if (typeof id === "string") {
+            fetchPortfolio(id); // id is explicitly a string here
         }
         setTimeout(() => setLoading(false), 1000);
-    }, [loading]);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -64,7 +65,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
                 setLoading(false);
                 throw new Error("Please fill in the required fields.");
             }
-            const response = await apiService.update<{ portfolio: Portfolio }>(`/portfolio/${params.id}/update`, {
+            const response = await apiService.update<{ portfolio: Portfolio }>(`/portfolio/${id}/update`, {
                 'title': formData.title,
                 'description': formData.description,
                 'urlPortfolio': formData.urlPortfolio,
@@ -79,7 +80,7 @@ const EditPortfolio = ({ params }: { params: { id: string } }) => {
             }
 
             if (thumbnail) {
-                const uploadThumbnail = await apiService.uploadFile(`/portfolio/upload/${params?.id}`, thumbnail);
+                const uploadThumbnail = await apiService.uploadFile(`/portfolio/upload/${id}`, thumbnail);
                 if (![200, 201].includes(uploadThumbnail.meta.code)) {
                     throw new Error("Failed to upload photo.");
                 }

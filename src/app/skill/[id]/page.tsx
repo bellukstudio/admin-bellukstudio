@@ -9,10 +9,10 @@ import { skillValidationSchema } from "@/core/validation/schemaValidation";
 import { validateForm } from "@/core/validation/utility/validationForm";
 import { Skill } from "@/types/sklill";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const EditSkill = ({ params }: { params: { id: string } }) => {
+const EditSkill = () => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const { logout } = useAuth();
@@ -21,15 +21,16 @@ const EditSkill = ({ params }: { params: { id: string } }) => {
         level: "",
     });
     const [errorForm, setErrorForm] = useState<any[]>([]);
+    const { id } = useParams();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const fetchSkill = async () => {
+    const fetchSkill =async (id: string) => {
         try {
-            const response = await apiService.get<{ skill: Skill }>(`/skill/${params.id}`);
+            const response = await apiService.get<{ skill: Skill }>(`/skill/${id}`);
             if (response.meta.code !== 200) {
                 if (response.meta.message === "Unauthorized") {
                     logout();
@@ -44,10 +45,10 @@ const EditSkill = ({ params }: { params: { id: string } }) => {
     }
 
     useEffect(() => {
-        if (params?.id) {
-            fetchSkill();
+        if (typeof id === "string") {
+            fetchSkill(id); // id is explicitly a string here
         }
-    }, [loading]);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -65,7 +66,7 @@ const EditSkill = ({ params }: { params: { id: string } }) => {
             }
 
 
-            const response = await apiService.update<{ skill: Skill }>(`/skill/${params.id}/update`, {
+            const response = await apiService.update<{ skill: Skill }>(`/skill/${id}/update`, {
                 'skillName': formData.skillName,
                 'level': formData.level,
             });

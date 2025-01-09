@@ -29,7 +29,7 @@ const OverviewPage = () => {
 
     useEffect(() => {
         fetchOverview();
-    }, [hidden]);
+    }, []);
     return (
         <DefaultLayout>
             {/* Root container with min-h-screen to ensure full screen */}

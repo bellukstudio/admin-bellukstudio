@@ -9,14 +9,14 @@ import { overviewValidationSchema } from "@/core/validation/schemaValidation";
 import { validateForm } from "@/core/validation/utility/validationForm";
 import { Overview } from "@/types/overview";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const EditOverview = ({ params }: { params: { id: string } }) => {
+const EditOverview = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [errorForm, setErrorForm] = useState<any[]>([]);
     const [photo, setPhoto] = useState<File | null>(null);
-
+    const { id } = useParams();
     const [formData, setFormData] = useState({
         overview: "",
         urlGithub: "",
@@ -27,9 +27,9 @@ const EditOverview = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const { logout } = useAuth();
 
-    const fetchOverview = async () => {
+    const fetchOverview = async (id: string) => {
         try {
-            const response = await apiService.get<{ overview: Overview }>(`/overview/${params.id}`);
+            const response = await apiService.get<{ overview: Overview }>(`/overview/${id}`);
             if (response.meta.code === 200) {
                 setFormData(response.data.overview);
             }
@@ -39,11 +39,11 @@ const EditOverview = ({ params }: { params: { id: string } }) => {
     }
 
     useEffect(() => {
-        if (params?.id) {
-            fetchOverview();
+        if (typeof id === "string") {
+            fetchOverview(id); // id is explicitly a string here
         }
         setTimeout(() => setLoading(false), 1000);
-    }, [loading]);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -67,7 +67,7 @@ const EditOverview = ({ params }: { params: { id: string } }) => {
                 setLoading(false);
                 throw new Error("Validation error");
             }
-            const response = await apiService.update<{ overview: Overview }>(`/overview/${params.id}/update`, {
+            const response = await apiService.update<{ overview: Overview }>(`/overview/${id}/update`, {
                 'overview': formData.overview,
                 'urlGithub': formData.urlGithub,
                 'urlLinkedIn': formData.urlLinkedIn,
@@ -83,7 +83,7 @@ const EditOverview = ({ params }: { params: { id: string } }) => {
                 throw new Error(`Failed to update experience. ${response.meta.message}`);
             }
             if (photo) {
-                const responsePhoto = await apiService.uploadFile(`/overview/upload/${params?.id}`, photo);
+                const responsePhoto = await apiService.uploadFile(`/overview/upload/${id}`, photo);
                 if (![200, 201].includes(responsePhoto.meta.code)) {
                     throw new Error("Failed to upload photo." + responsePhoto.meta.message);
                 }

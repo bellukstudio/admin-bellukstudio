@@ -8,15 +8,16 @@ import { experienceValidationSchema } from "@/core/validation/schemaValidation";
 import { validateForm } from "@/core/validation/utility/validationForm";
 import { Experience } from "@/types/experience";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
-const EditExperience = ({ params }: { params: { id: string } }) => {
+const EditExperience = () => {
 
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
     const { logout } = useAuth();
+    const { id } = useParams();
     const [formData, setFormData] = useState({
         jobTitle: "",
         company: "",
@@ -29,8 +30,8 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
 
 
     useEffect(() => {
-        if (params?.id) {
-            fetchExperience(params.id);
+        if (typeof id === "string") {
+            fetchExperience(id); // id is explicitly a string here
         }
         setTimeout(() => setLoading(false), 1000);
     }, []);
@@ -70,7 +71,7 @@ const EditExperience = ({ params }: { params: { id: string } }) => {
             }
 
             setErrorForm([]);
-            const response = await apiService.update<{ experience: Experience }>(`/experiences/${params.id}/update`, {
+            const response = await apiService.update<{ experience: Experience }>(`/experiences/${id}/update`, {
                 'jobTitle': formData.jobTitle,
                 'company': formData.company,
                 'startMonth': formData.startMonth,

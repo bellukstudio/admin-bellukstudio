@@ -28,7 +28,7 @@ const OverviewPage = () => {
 
     useEffect(() => {
         setTimeout(() => setLoading(false), 1000);
-    }, [loading]);
+    }, []);
 
 
     const handleSubmit = async (e: React.FormEvent) => {
