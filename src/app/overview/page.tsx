@@ -6,6 +6,7 @@ import apiService from "@/core/response/apiResponse";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Overview } from "@/types/overview";
+import PrivateRoute from "@/core/routes/privateRoute";
 const OverviewPage = () => {
     const [hidden, setHidden] = useState<boolean>(false);
 
@@ -31,28 +32,30 @@ const OverviewPage = () => {
         fetchOverview();
     }, []);
     return (
-        <DefaultLayout>
-            {/* Root container with min-h-screen to ensure full screen */}
-            <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-                {/* Container content */}
-                <div className="mx-auto max-w-7xl py-10 px-4 sm:px-6 lg:px-8">
-                    {/* Link */}
-                    {hidden ? null : (
-                        <Link
-                            href="/overview/create"
-                            className="inline-flex items-center justify-center rounded-full bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
-                        >
-                            Create Overview
-                        </Link>
-                    )}
+        <PrivateRoute>
+            <DefaultLayout>
+                {/* Root container with min-h-screen to ensure full screen */}
+                <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                    {/* Container content */}
+                    <div className="mx-auto max-w-7xl py-10 px-4 sm:px-6 lg:px-8">
+                        {/* Link */}
+                        {hidden ? null : (
+                            <Link
+                                href="/overview/create"
+                                className="inline-flex items-center justify-center rounded-full bg-meta-3 px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+                            >
+                                Create Overview
+                            </Link>
+                        )}
 
-                    {/* Table Section */}
-                    <div className="flex flex-col gap-10 mt-10">
-                        <TableOverview />
+                        {/* Table Section */}
+                        <div className="flex flex-col gap-10 mt-10">
+                            <TableOverview />
+                        </div>
                     </div>
                 </div>
-            </div>
-        </DefaultLayout>
+            </DefaultLayout>
+        </PrivateRoute>
     );
 }
 

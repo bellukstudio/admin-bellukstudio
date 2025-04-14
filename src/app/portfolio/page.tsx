@@ -2,10 +2,11 @@
 
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import TablePortfolio from "@/components/Tables/table-portfolio";
+import PrivateRoute from "@/core/routes/privateRoute";
 import Link from "next/link";
 
 const Portfolio = () => {
-    return (
+    return (<PrivateRoute>
         <DefaultLayout>
             {/* Root container with min-h-screen to ensure full screen */}
             <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -21,11 +22,12 @@ const Portfolio = () => {
 
                     {/* Table Section */}
                     <div className="flex flex-col gap-10 mt-10">
-                        <TablePortfolio/>
+                        <TablePortfolio />
                     </div>
                 </div>
             </div>
         </DefaultLayout>
+    </PrivateRoute>
     );
 }
 

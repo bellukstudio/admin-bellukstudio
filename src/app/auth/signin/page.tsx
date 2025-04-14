@@ -27,7 +27,7 @@ const SignIn: React.FC = () => {
 
   useEffect(() => {
     if (token) {
-      router.replace("/dashboard");
+      router.replace("/profile");
     }
   }, [token, router]);
 
