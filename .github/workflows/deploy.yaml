@@ -6,14 +6,14 @@ on:
       - main
 
 jobs:
-  deploy:
+  # Job 1: Pull latest changes
+  pull-changes:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Deploy to VPS via SSH
+    - name: Pull Latest Changes
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.VPS_HOST }}
@@ -22,18 +22,55 @@ jobs:
         port: 22
         script: |
           cd /var/www/adminpersonal.bellukstudio.my.id
-
           echo "📥 Pull latest changes..."
           git pull origin main
 
+  # Job 2: Build Docker image
+  build-image:
+    runs-on: ubuntu-latest
+    needs: pull-changes
+    steps:
+    - name: Build Docker Image
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: 22
+        script: |
+          cd /var/www/adminpersonal.bellukstudio.my.id
           echo "🐳 Build Docker image..."
           docker build -t adminpersonal .
 
+  # Job 3: Stop old container
+  stop-container:
+    runs-on: ubuntu-latest
+    needs: build-image
+    steps:
+    - name: Stop Old Container
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: 22
+        script: |
           echo "🧼 Stop and remove old container..."
           docker stop adminpersonal || true
           docker rm adminpersonal || true
 
+  # Job 4: Run new container
+  run-container:
+    runs-on: ubuntu-latest
+    needs: stop-container
+    steps:
+    - name: Run New Container
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: 22
+        script: |
           echo "🚀 Run new container..."
           docker run -d --name adminpersonal -p 3001:3001 adminpersonal
-
-          
