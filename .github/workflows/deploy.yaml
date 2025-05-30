@@ -1,0 +1,32 @@
+name: Deploy Next.js via Git Pull
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Deploy to VPS via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: 22
+    - name: Pull branch
+      run: git pull origin main
+    - name: Build Docker image
+      run: docker build -t adminpersonal .
+    - name: Stop and remove old container
+      run: docker stop adminpersonal || true && docker rm adminpersonal || true
+    - name: Run new container
+      run: docker run -d --name adminpersonal -p 3001:3001 adminpersonal
+
+          
