@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  # Job 1: Pull latest changes with permission fix
+  # Job 1: Pull latest changes
   pull-changes:
     runs-on: ubuntu-latest
     steps:
@@ -23,17 +23,9 @@ jobs:
         script: |
           cd /var/www/adminpersonal.bellukstudio.my.id
           echo "📥 Pull latest changes..."
-          
-          # Opsi 1: Fix permission dulu
           sudo chown -R $USER:$USER .git/
+          sudo chown -R $USER:$USER .
           git pull origin main
-          
-          # Atau Opsi 2: Gunakan sudo (jika diperlukan)
-          # sudo git pull origin main
-          
-          # Atau Opsi 3: Reset ownership setelah pull
-          # git pull origin main
-          # sudo chown -R www-data:www-data .
 
   # Job 2: Build Docker image
   build-image:
