@@ -10,30 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Deploy to VPS via SSH
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        password: ${{ secrets.VPS_PASSWORD }}
-        port: 22
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
+      - name: Pull branch
         script: |
-          cd /var/www/adminpersonal.bellukstudio.my.id
-
           echo "📥 Pull latest changes..."
-          git pull origin main
 
+          cd /var/www/adminpersonal.bellukstudio.my.id
+          git pull origin main
+      - name: Build Docker image
+        script: |
           echo "🐳 Build Docker image..."
           docker build -t adminpersonal .
-
+      - name: Stop and remove old container
+        script: |
           echo "🧼 Stop and remove old container..."
           docker stop adminpersonal || true
           docker rm adminpersonal || true
-
-          echo "🚀 Run new container..."
-          docker run -d --name adminpersonal -p 3001:3001 adminpersonal
-
+      - name: Run new container
+        script: |
           
+          echo "🚀 Run new container..."
+          docker run -d --name adminpersonal -p 3002:3002 adminpersonal
