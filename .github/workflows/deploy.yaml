@@ -20,13 +20,20 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
-    - name: Pull branch
-      run: git pull origin main
-    - name: Build Docker image
-      run: docker build -t adminpersonal .
-    - name: Stop and remove old container
-      run: docker stop adminpersonal || true && docker rm adminpersonal || true
-    - name: Run new container
-      run: docker run -d --name adminpersonal -p 3001:3001 adminpersonal
+        script: |
+          cd /var/www/adminpersonal.bellukstudio.my.id
+
+          echo "📥 Pull latest changes..."
+          git pull origin main
+
+          echo "🐳 Build Docker image..."
+          docker build -t adminpersonal .
+
+          echo "🧼 Stop and remove old container..."
+          docker stop adminpersonal || true
+          docker rm adminpersonal || true
+
+          echo "🚀 Run new container..."
+          docker run -d --name adminpersonal -p 3001:3001 adminpersonal
 
           
