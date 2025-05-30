@@ -30,10 +30,9 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup nodejs
-RUN adduser -SDH admin-nextjs
+RUN adduser -SDH nextjs
 RUN mkdir .next
-RUN chown admin-nextjs:nodejs .next
-
+RUN chown nextjs:nodejs .next
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
