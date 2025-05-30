@@ -21,7 +21,6 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
         script: |
-          git config --global --add safe.directory /var/www/adminpersonal.***.my.id
           cd /var/www/adminpersonal.bellukstudio.my.id
           echo "📥 Pull latest changes..."
           git pull origin main
