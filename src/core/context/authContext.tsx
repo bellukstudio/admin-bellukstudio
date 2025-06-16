@@ -24,37 +24,40 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [token, setToken] = useState<string | null>(null);
-    const [isClient, setIsClient] = useState(false); // Ensure consistent hydration
     const router = useRouter();
 
+    // Load token on client-side only
     useEffect(() => {
-        setIsClient(true); // Set to true once the client mounts
-        const storedToken = localStorage.getItem("jwtToken");
-        if (storedToken) {
-            setToken(storedToken); // Use the token directly as a string
+        if (typeof window !== "undefined") {
+            const storedToken = localStorage.getItem("jwtToken");
+            if (storedToken) {
+                setToken(storedToken);
+            }
         }
     }, []);
 
     const login = (jwtToken: string) => {
         setToken(jwtToken);
-        localStorage.setItem("jwtToken", jwtToken);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("jwtToken", jwtToken);
+        }
         router.push("/dashboard");
     };
 
     const logout = () => {
         setToken(null);
-        localStorage.removeItem("jwtToken");
+        if (typeof window !== "undefined") {
+            localStorage.removeItem("jwtToken");
+        }
         router.push("/");
     };
 
     const value = useMemo(() => ({ token, login, logout }), [token]);
 
-    if (!isClient) {
-        return null; // Avoid rendering until the client has mounted
-    }
-
     return (
-        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
     );
 };
 
