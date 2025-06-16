@@ -21,58 +21,67 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
         script: |
-          cd /var/www/adminpersonal.bellukstudio.my.id
+          cd /home/bellukstudio/projects/adminpersonal.bellukstudio.my.id
           echo "📥 Pull latest changes..."
-          sudo chown -R $USER:$USER .git/
-          sudo chown -R $USER:$USER .
+          # Debug current state
+          echo "Current user: $(whoami)"
+          echo "Directory owner: $(ls -la . | head -2)"
+          echo "Git directory owner: $(ls -la .git/ | head -2)"
+
+          # Add safe directory untuk Git
+          git config --global --add safe.directory /home/bellukstudio/projects/adminpersonal.bellukstudio.my.id
+          git config --global --add safe.directory '*'
+
+          # Fix ownership issues
+          sudo chown -R $(whoami):$(whoami) . || true
           git pull origin main
 
-  # Job 2: Build Docker image
-  build-image:
-    runs-on: ubuntu-latest
-    needs: pull-changes
-    steps:
-    - name: Build Docker Image
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        password: ${{ secrets.VPS_PASSWORD }}
-        port: 22
-        script: |
-          cd /var/www/adminpersonal.bellukstudio.my.id
-          echo "🐳 Build Docker image..."
-          docker build -t adminpersonal .
+  # # Job 2: Build Docker image
+  # build-image:
+  #   runs-on: ubuntu-latest
+  #   needs: pull-changes
+  #   steps:
+  #   - name: Build Docker Image
+  #     uses: appleboy/ssh-action@v1.0.0
+  #     with:
+  #       host: ${{ secrets.VPS_HOST }}
+  #       username: ${{ secrets.VPS_USER }}
+  #       password: ${{ secrets.VPS_PASSWORD }}
+  #       port: 22
+  #       script: |
+  #         cd /var/www/adminpersonal.bellukstudio.my.id
+  #         echo "🐳 Build Docker image..."
+  #         docker build -t adminpersonal .
 
-  # Job 3: Stop old container
-  stop-container:
-    runs-on: ubuntu-latest
-    needs: build-image
-    steps:
-    - name: Stop Old Container
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        password: ${{ secrets.VPS_PASSWORD }}
-        port: 22
-        script: |
-          echo "🧼 Stop and remove old container..."
-          docker stop adminpersonal || true
-          docker rm adminpersonal || true
+  # # Job 3: Stop old container
+  # stop-container:
+  #   runs-on: ubuntu-latest
+  #   needs: build-image
+  #   steps:
+  #   - name: Stop Old Container
+  #     uses: appleboy/ssh-action@v1.0.0
+  #     with:
+  #       host: ${{ secrets.VPS_HOST }}
+  #       username: ${{ secrets.VPS_USER }}
+  #       password: ${{ secrets.VPS_PASSWORD }}
+  #       port: 22
+  #       script: |
+  #         echo "🧼 Stop and remove old container..."
+  #         docker stop adminpersonal || true
+  #         docker rm adminpersonal || true
 
-  # Job 4: Run new container
-  run-container:
-    runs-on: ubuntu-latest
-    needs: stop-container
-    steps:
-    - name: Run New Container
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        password: ${{ secrets.VPS_PASSWORD }}
-        port: 22
-        script: |
-          echo "🚀 Run new container..."
-          docker run -d --name adminpersonal -p 3001:3001 adminpersonal
+  # # Job 4: Run new container
+  # run-container:
+  #   runs-on: ubuntu-latest
+  #   needs: stop-container
+  #   steps:
+  #   - name: Run New Container
+  #     uses: appleboy/ssh-action@v1.0.0
+  #     with:
+  #       host: ${{ secrets.VPS_HOST }}
+  #       username: ${{ secrets.VPS_USER }}
+  #       password: ${{ secrets.VPS_PASSWORD }}
+  #       port: 22
+  #       script: |
+  #         echo "🚀 Run new container..."
+  #         docker run -d --name adminpersonal -p 3001:3001 adminpersonal
