@@ -8,7 +8,7 @@ import Image from "next/image";
 const TablePortfolio = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 100;
     const [portfolio, setPortfolio] = useState<Portfolio[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
@@ -24,7 +24,7 @@ const TablePortfolio = () => {
 
     const fetchPortfolio = async () => {
         try {
-            const response = await apiService.get<{ portfolio: Portfolio[] }>("/portfolio");
+            const response = await apiService.get<{ portfolio: Portfolio[] }>("/portfolio/allportfolio");
             const portfolioData = response.data.portfolio;
 
             if (portfolioData.length > 0) {
@@ -50,6 +50,21 @@ const TablePortfolio = () => {
         router.push(`/portfolio/${id}`);
     }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Deletes a portfolio by its ID after user confirmation.
+ * 
+ * This function prompts the user for confirmation before attempting to delete
+ * a specified portfolio. If confirmed, it sends a request to the server to
+ * delete the portfolio. Upon successful deletion, it updates the local state
+ * to reflect the change and displays a success message. If the deletion fails,
+ * an error message is displayed. In case of an error during the process, an
+ * error message is logged and shown to the user.
+ *
+ * @param {string} id - The ID of the portfolio to be deleted.
+ */
+
+/*******  f0b5443d-8cfa-4f7a-9dc6-98d8c1a70b18  *******/
     const handleDelete = async (id: string) => {
         if (window.confirm("Are you sure you want to delete this portfolio?")) {
             setLoading(true);
@@ -83,7 +98,7 @@ const TablePortfolio = () => {
                 />
 
             </div>
-            <div className="max-w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto max-h-screen overflow-y-auto">
                 <table className="w-full table-auto">
                     <thead>
                         <tr className="bg-gray-2 text-left dark:bg-meta-4">
@@ -149,7 +164,7 @@ const TablePortfolio = () => {
                 </table>
             </div>
             {/* Pagination */}
-            <div className="mt-4 flex justify-end py-5">
+            {/* <div className="mt-4 flex justify-end py-5">
                 {Array.from({ length: totalPages }, (_, i) => (
                     <button
                         key={i}
@@ -162,7 +177,7 @@ const TablePortfolio = () => {
                         {i + 1}
                     </button>
                 ))}
-            </div>
+            </div> */}
         </div>
     );
 };

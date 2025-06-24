@@ -30,7 +30,7 @@ const EditPortfolio = () => {
 
     const fetchPortfolio = async (id: string) => {
         try {
-            const response = await apiService.get<{ portfolio: Portfolio }>(`/portfolio/${id}`);
+            const response = await apiService.get<{ portfolio: Portfolio }>(`/portfolio/${id}/show`);
             const fetchPortfolio = response.data.portfolio;
             if (response.meta.code === 200) {
                 setFormData(fetchPortfolio);

@@ -1,0 +1,15 @@
+services:
+  adminpersonal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: adminpersonal
+    restart: always
+    ports:
+      - 3003:3003
+    networks:
+      - bellukstudio_network
+
+networks:
+  bellukstudio_network:
+    external: true      
